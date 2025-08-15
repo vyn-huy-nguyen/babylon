@@ -1,0 +1,36 @@
+{
+  "name": "babylon-remix-practice",
+  "version": "1.0.0",
+  "description": "A Remix project with TypeScript and Babylon.js for 3D practice",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "remix build",
+    "dev": "remix dev --manual",
+    "start": "remix-serve ./build/index.js",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^8.22.3",
+    "@babylonjs/gui": "^8.22.3",
+    "@babylonjs/loaders": "^8.22.3",
+    "@babylonjs/materials": "^8.22.3",
+    "@remix-run/node": "^2.5.0",
+    "@remix-run/react": "^2.5.0",
+    "@remix-run/serve": "^2.5.0",
+    "isbot": "^4.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^2.5.0",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
