@@ -93,7 +93,17 @@ export default function BabylonScene() {
   // === Điều Khiển Load Thêm Model ===
   // State cho việc load thêm ghế
   const [chairLoaded, setChairLoaded] = useState(false);
-  
+  const [chairPosition, setChairPosition] = useState({ 
+    x: -55.41, 
+    y: 22.17, 
+    z: 2.52 
+  }); // Vị trí ghế mới
+  const [chairRotation, setChairRotation] = useState({ 
+    x: 0, 
+    y: -1.5, 
+    z: 0 
+  }); // Xoay ghế mới
+
   // State để theo dõi model đã load xong
   const [modelFullyLoaded, setModelFullyLoaded] = useState(false);
 
@@ -660,11 +670,14 @@ export default function BabylonScene() {
    */
   const debugChair2 = (scene: any) => {
     console.log("🔍 Tìm kiếm chair2 trong scene...");
-    console.log("📋 Tất cả meshes:", scene.meshes.map((m: any) => m.name));
-    
+    console.log(
+      "📋 Tất cả meshes:",
+      scene.meshes.map((m: any) => m.name)
+    );
+
     // Tìm tất cả mesh có tên chứa "chair2"
-    const chair2Meshes = scene.meshes.filter(
-      (m: any) => m.name.includes("chair2")
+    const chair2Meshes = scene.meshes.filter((m: any) =>
+      m.name.includes("chair2")
     );
 
     if (chair2Meshes.length > 0) {
@@ -674,23 +687,31 @@ export default function BabylonScene() {
         console.log(`     📍 Vị trí:`, mesh.position);
         console.log(`     📏 Tỷ lệ:`, mesh.scaling);
         console.log(`     🔄 Xoay:`, mesh.rotation);
-        console.log(`     👥 Parent:`, mesh.parent ? mesh.parent.name : "Không có");
+        console.log(
+          `     👥 Parent:`,
+          mesh.parent ? mesh.parent.name : "Không có"
+        );
       });
-      
+
       // Tìm chair2 chính (không có primitive)
       const mainChair2 = chair2Meshes.find((m: any) => m.name === "chair2");
       if (mainChair2) {
         console.log("🎯 Chair2 chính được tìm thấy:", mainChair2.name);
         return mainChair2;
       }
-      
+
       // Tìm chair2_primitive0 (thường là mesh chính của chair2)
-      const chair2Primitive = chair2Meshes.find((m: any) => m.name === "chair2_primitive0");
+      const chair2Primitive = chair2Meshes.find(
+        (m: any) => m.name === "chair2_primitive0"
+      );
       if (chair2Primitive) {
-        console.log("🎯 Sử dụng chair2_primitive0 làm tham chiếu:", chair2Primitive.name);
+        console.log(
+          "🎯 Sử dụng chair2_primitive0 làm tham chiếu:",
+          chair2Primitive.name
+        );
         return chair2Primitive;
       }
-      
+
       // Nếu không tìm thấy, sử dụng chair2 đầu tiên
       console.log("⚠️ Không tìm thấy chair2 chính, sử dụng chair2 đầu tiên");
       return chair2Meshes[0];
@@ -732,20 +753,17 @@ export default function BabylonScene() {
         console.log("🎯 Sử dụng vị trí camera ban đầu...");
         console.log("📷 Camera position:", camera.position);
         console.log("📷 Camera target:", camera.target);
-        
-        // Lấy vị trí camera ban đầu
-        referencePosition = camera.position.clone();
-        
-        // Điều chỉnh vị trí để ghế đặt ở vị trí phù hợp
-        // Thay vì đặt ở vị trí camera, đặt ở vị trí gần camera nhưng trên mặt đất
-        referencePosition.y = 0; // Đặt ghế trên mặt đất
-        referencePosition.x += 2; // Dịch sang phải 2 đơn vị
-        referencePosition.z += 2; // Dịch về phía trước 2 đơn vị
-        
+
+        // Sử dụng vị trí từ state
+        referencePosition = new Vector3(chairPosition.x, chairPosition.y, chairPosition.z);
+
         // Sử dụng tỷ lệ mặc định
         referenceScale = new Vector3(1, 1, 1);
-        
-        console.log("📍 Vị trí ghế mới (điều chỉnh từ camera):", referencePosition);
+
+        console.log(
+          "📍 Vị trí ghế mới (điều chỉnh từ camera):",
+          referencePosition
+        );
       } else {
         console.log("⚠️ Không tìm thấy camera, sử dụng vị trí mặc định");
         // Sử dụng vị trí mặc định ở trung tâm
@@ -754,7 +772,7 @@ export default function BabylonScene() {
       }
 
       console.log("🔄 Bắt đầu load Chair.glb...");
-      
+
       // Load ghế từ file GLB
       await SceneLoader.AppendAsync(
         "/assets/", // Thư mục chứa file
@@ -763,26 +781,33 @@ export default function BabylonScene() {
       );
 
       console.log("✅ Đã load Chair.glb thành công");
-      console.log("📋 Meshes sau khi load:", scene.meshes.map((m: any) => m.name));
+      console.log(
+        "📋 Meshes sau khi load:",
+        scene.meshes.map((m: any) => m.name)
+      );
 
       // Tìm ghế mới vừa load - tìm mesh có tên chứa "Chair" và không phải chair2
       console.log("🔍 Tìm ghế mới sau khi load...");
-      console.log("📋 Tất cả meshes hiện tại:", scene.meshes.map((m: any) => m.name));
-      
-      const newChair = scene.meshes.find((m: any) => 
-        m.name.includes("Chair") && 
-        !m.name.includes("chair2") &&
-        m.name !== selectedMesh &&
-        !m.name.includes("primitive") // Loại bỏ primitive meshes
+      console.log(
+        "📋 Tất cả meshes hiện tại:",
+        scene.meshes.map((m: any) => m.name)
+      );
+
+      const newChair = scene.meshes.find(
+        (m: any) =>
+          m.name.includes("Chair") &&
+          !m.name.includes("chair2") &&
+          m.name !== selectedMesh &&
+          !m.name.includes("primitive") // Loại bỏ primitive meshes
       );
 
       if (newChair) {
         console.log("🎯 Tìm thấy ghế mới:", newChair.name);
         console.log("📍 Vị trí ban đầu của ghế mới:", newChair.position);
-        
+
         // Thiết lập vị trí, xoay và tỷ lệ cho ghế mới
         newChair.position = referencePosition;
-        newChair.rotation = new Vector3(0, 0, 0); // Không xoay
+        newChair.rotation = new Vector3(chairRotation.x, chairRotation.y, chairRotation.z);
         newChair.scaling = new Vector3(1, 1, 1); // Tỷ lệ mặc định
 
         // Đảm bảo ghế mới hiển thị
@@ -800,8 +825,11 @@ export default function BabylonScene() {
         console.log("✅ Ghế đã được load thành công!");
       } else {
         console.log("❌ Không tìm thấy ghế mới sau khi load");
-        console.log("🔍 Tìm tất cả mesh có 'Chair':", 
-          scene.meshes.filter((m: any) => m.name.includes("Chair")).map((m: any) => m.name)
+        console.log(
+          "🔍 Tìm tất cả mesh có 'Chair':",
+          scene.meshes
+            .filter((m: any) => m.name.includes("Chair"))
+            .map((m: any) => m.name)
         );
       }
     } catch (error) {
@@ -1323,15 +1351,22 @@ export default function BabylonScene() {
   // Effect để load thêm ghế khi scene sẵn sàng và model đã load xong
   useEffect(() => {
     const loadChair = async () => {
-      if (currentScene && !chairLoaded && modelFullyLoaded && availableMeshes.length > 0) {
-        console.log("🚀 Bắt đầu load ghế mới sau khi model đã load xong hoàn toàn...");
+      if (
+        currentScene &&
+        !chairLoaded &&
+        modelFullyLoaded &&
+        availableMeshes.length > 0
+      ) {
+        console.log(
+          "🚀 Bắt đầu load ghế mới sau khi model đã load xong hoàn toàn..."
+        );
         console.log("📋 Số meshes có sẵn:", availableMeshes.length);
         console.log("📋 Meshes có sẵn:", availableMeshes);
         console.log("✅ Model đã load xong:", modelFullyLoaded);
-        
+
         // Đợi thêm một chút để đảm bảo tất cả transform đã được áp dụng
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         await loadAdditionalChair(currentScene);
       }
     };
@@ -1339,7 +1374,23 @@ export default function BabylonScene() {
     loadChair();
   }, [currentScene, chairLoaded, modelFullyLoaded, availableMeshes]);
 
+  // Effect để cập nhật vị trí ghế khi chairPosition thay đổi
+  useEffect(() => {
+    if (currentScene && chairLoaded) {
+      const newChair = currentScene.meshes.find((m: any) => 
+        m.name.includes("Chair") && 
+        !m.name.includes("chair2") &&
+        !m.name.includes("primitive")
+      );
 
+      if (newChair) {
+        const { Vector3 } = require("@babylonjs/core");
+        newChair.position = new Vector3(chairPosition.x, chairPosition.y, chairPosition.z);
+        newChair.rotation = new Vector3(chairRotation.x, chairRotation.y, chairRotation.z);
+        console.log("🔄 Đã cập nhật vị trí và xoay ghế:", { position: chairPosition, rotation: chairRotation });
+      }
+    }
+  }, [chairPosition, chairRotation, currentScene, chairLoaded]);
 
   // ===== 13. RENDER UI =====
 
@@ -1419,7 +1470,7 @@ export default function BabylonScene() {
         {/* Simple Chair Load Button */}
         <div className="mb-4 border-t border-gray-600 pt-4">
           <h4 className="text-md font-semibold mb-3">🪑 Ghế Thêm</h4>
-          
+
           <button
             onClick={() => {
               setChairLoaded(false);
@@ -1431,11 +1482,201 @@ export default function BabylonScene() {
           >
             {chairLoaded ? "🔄 Load Lại Ghế" : "➕ Load Thêm Ghế"}
           </button>
-          
+
           <div className="mt-2 text-xs text-gray-400">
             Ghế mới sẽ được đặt ở vị trí gần camera ban đầu
           </div>
-          
+
+          {/* Chair Position Controls */}
+          <div className="mt-4 space-y-3">
+            <h5 className="text-sm font-medium">📍 Điều Chỉnh Vị Trí Ghế</h5>
+            
+            {/* X Position */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                X (Trái/Phải): {chairPosition.x.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="-100"
+                max="100"
+                step="0.01"
+                value={chairPosition.x}
+                onChange={(e) =>
+                  setChairPosition((prev) => ({
+                    ...prev,
+                    x: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>-100 (Trái)</span>
+                <span>0 (Giữa)</span>
+                <span>+100 (Phải)</span>
+              </div>
+            </div>
+
+            {/* Y Position */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                Y (Lên/Xuống): {chairPosition.y.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="-50"
+                max="100"
+                step="0.01"
+                value={chairPosition.y}
+                onChange={(e) =>
+                  setChairPosition((prev) => ({
+                    ...prev,
+                    y: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>-50 (Thấp)</span>
+                <span>0 (Mặt đất)</span>
+                <span>+100 (Cao)</span>
+              </div>
+            </div>
+
+            {/* Z Position */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                Z (Trước/Sau): {chairPosition.z.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="-100"
+                max="100"
+                step="0.01"
+                value={chairPosition.z}
+                onChange={(e) =>
+                  setChairPosition((prev) => ({
+                    ...prev,
+                    z: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>-100 (Sau)</span>
+                <span>0 (Giữa)</span>
+                <span>+100 (Trước)</span>
+              </div>
+            </div>
+
+            {/* Reset Button */}
+            <button
+              onClick={() => {
+                setChairPosition({ 
+                  x: -54.69, 
+                  y: 22.17, 
+                  z: 2.02 
+                });
+              }}
+              className="w-full px-3 py-2 bg-orange-600 hover:bg-orange-700 rounded text-sm font-medium"
+            >
+              🔄 Reset Vị Trí
+            </button>
+          </div>
+
+          {/* Chair Rotation Controls */}
+          <div className="mt-4 space-y-3">
+            <h5 className="text-sm font-medium">🔄 Điều Chỉnh Xoay Ghế</h5>
+            
+            {/* X Rotation */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                X (Nghiêng): {chairRotation.x.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="-3.14"
+                max="3.14"
+                step="0.01"
+                value={chairRotation.x}
+                onChange={(e) =>
+                  setChairRotation((prev) => ({
+                    ...prev,
+                    x: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>-π (Nghiêng xuống)</span>
+                <span>0 (Thẳng)</span>
+                <span>+π (Nghiêng lên)</span>
+              </div>
+            </div>
+
+            {/* Y Rotation */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                Y (Xoay ngang): {chairRotation.y.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="-3.14"
+                max="3.14"
+                step="0.01"
+                value={chairRotation.y}
+                onChange={(e) =>
+                  setChairRotation((prev) => ({
+                    ...prev,
+                    y: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>-π (Xoay trái)</span>
+                <span>0 (Thẳng)</span>
+                <span>+π (Xoay phải)</span>
+              </div>
+            </div>
+
+            {/* Z Rotation */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                Z (Nghiêng ngang): {chairRotation.z.toFixed(2)}
+              </label>
+              <input
+                type="range"
+                min="-3.14"
+                max="3.14"
+                step="0.01"
+                value={chairRotation.z}
+                onChange={(e) =>
+                  setChairRotation((prev) => ({
+                    ...prev,
+                    z: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>-π (Nghiêng trái)</span>
+                <span>0 (Thẳng)</span>
+                <span>+π (Nghiêng phải)</span>
+              </div>
+            </div>
+
+            {/* Reset Rotation Button */}
+            <button
+              onClick={() => {
+                setChairRotation({ x: 0, y: 0, z: 0 });
+              }}
+              className="w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium"
+            >
+              🔄 Reset Xoay
+            </button>
+          </div>
+
           <button
             onClick={() => {
               if (currentScene) {
@@ -1444,16 +1685,20 @@ export default function BabylonScene() {
                   console.log("🔍 Debug vị trí camera và ghế:");
                   console.log("📷 Camera position:", camera.position);
                   console.log("📷 Camera target:", camera.target);
-                  
-                  const newChair = currentScene.meshes.find((m: any) => 
-                    m.name.includes("Chair") && 
-                    !m.name.includes("chair2") &&
-                    !m.name.includes("primitive")
+
+                  const newChair = currentScene.meshes.find(
+                    (m: any) =>
+                      m.name.includes("Chair") &&
+                      !m.name.includes("chair2") &&
+                      !m.name.includes("primitive")
                   );
-                  
+
                   if (newChair) {
                     console.log("🎯 Ghế mới position:", newChair.position);
-                    console.log("🎯 Ghế mới world position:", newChair.getAbsolutePosition());
+                    console.log(
+                      "🎯 Ghế mới world position:",
+                      newChair.getAbsolutePosition()
+                    );
                   } else {
                     console.log("❌ Không tìm thấy ghế mới");
                   }
@@ -1466,19 +1711,20 @@ export default function BabylonScene() {
           >
             🔍 Debug Vị Trí
           </button>
-          
+
           <button
             onClick={() => {
               if (currentScene) {
-                const newChair = currentScene.meshes.find((m: any) => 
-                  m.name.includes("Chair") && 
-                  !m.name.includes("chair2") &&
-                  !m.name.includes("primitive")
+                const newChair = currentScene.meshes.find(
+                  (m: any) =>
+                    m.name.includes("Chair") &&
+                    !m.name.includes("chair2") &&
+                    !m.name.includes("primitive")
                 );
-                
+
                 if (newChair) {
                   const { Vector3 } = require("@babylonjs/core");
-                  
+
                   // Test các vị trí khác nhau
                   const testPositions = [
                     new Vector3(0, 0, 0), // Trung tâm
@@ -1489,10 +1735,12 @@ export default function BabylonScene() {
                     new Vector3(2, 0, 2), // Góc phải trước
                     new Vector3(-2, 0, 2), // Góc trái trước
                   ];
-                  
-                  const testIndex = Math.floor(Math.random() * testPositions.length);
+
+                  const testIndex = Math.floor(
+                    Math.random() * testPositions.length
+                  );
                   const testPosition = testPositions[testIndex];
-                  
+
                   newChair.position = testPosition;
                   newChair.isVisible = true;
                   newChair.setEnabled(true);
