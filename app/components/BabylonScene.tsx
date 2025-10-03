@@ -1058,8 +1058,8 @@ export default function BabylonScene() {
         try {
           // Tải mô hình GLTF từ file - AppendAsync thêm model vào scene hiện tại
           await SceneLoader.AppendAsync(
-            "/assets/interior/", // Thư mục chứa file
-            "condominium-room-101.gltf", // Tên file GLTF
+            "/assets/", // Thư mục chứa file
+            "final.glb", // Tên file GLTF
             scene // Scene để thêm model vào
           );
 
@@ -1398,7 +1398,7 @@ export default function BabylonScene() {
   return (
     <div className="relative w-full h-full">
       {/* Canvas element cho Babylon.js */}
-      <canvas
+    <canvas
         ref={canvasRef} // Gắn ref để lấy DOM element
         style={{
           width: "100%", // Chiếm toàn bộ width của parent
