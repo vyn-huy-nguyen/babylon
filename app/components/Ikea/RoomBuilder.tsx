@@ -32,15 +32,13 @@ export function RoomBuilder({
 
   const furnitureCatalog = [
     {
-      name: "Box",
+      name: "Table",
       category: "Seating",
       width: 2.0,
       length: 0.8,
       height: 0.8,
       color: "#8B4513",
     },
-    // { name: 'Coffee Table', category: 'Tables', width: 1.2, length: 0.6, height: 0.4, color: '#D2691E' },
-    // { name: 'TV Stand', category: 'Storage', width: 1.2, length: 0.4, height: 0.5, color: '#696969' },
   ];
 
   const addFurniture = (item: (typeof furnitureCatalog)[0]) => {
