@@ -103,7 +103,7 @@ export function Room3D({
 
     return false;
   };
-  
+
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
@@ -129,7 +129,7 @@ export function Room3D({
   // Main useEffect to initialize scene
   useEffect(() => {
     if (!canvasRef.current) return;
-    
+
     // Reset scene loaded state when dimensions change
     if (onSceneLoaded) {
       onSceneLoaded(false);
@@ -211,26 +211,26 @@ export function Room3D({
         // );
         // ambientLight.intensity = 0.3;
 
-         // Create single ceiling light in the center of the room
-         const lightIntensity = 1.5; // Reduced intensity for softer lighting
+        // Create single ceiling light in the center of the room
+        const lightIntensity = 1.5; // Reduced intensity for softer lighting
 
-         // Use PointLight for shadow casting
-         const centerLight = new PointLight(
-           "centerLight",
-           new Vector3(0, wallHeight + 1, 0), // Position at ceiling
-            scene
-          );
-         centerLight.intensity = lightIntensity;
-         centerLight.range = Math.max(scaledWidth, scaledLength) * 3; // Larger range
-        
+        // Use PointLight for shadow casting
+        const centerLight = new PointLight(
+          "centerLight",
+          new Vector3(0, wallHeight + 1, 0), // Position at ceiling
+          scene
+        );
+        centerLight.intensity = lightIntensity;
+        centerLight.range = Math.max(scaledWidth, scaledLength) * 3; // Larger range
+
         // Create a visible sphere to represent the light source
         const lightSphere = MeshBuilder.CreateSphere(
           "lightSphere",
           { diameter: 0.3 },
-            scene
-          );
+          scene
+        );
         lightSphere.position = new Vector3(0, wallHeight - 0.1, 0);
-        
+
         // Create glowing material for the light sphere
         const lightMaterial = new StandardMaterial("lightMaterial", scene);
         lightMaterial.diffuseColor = new Color3(1, 1, 0.8); // Warm white
@@ -650,25 +650,25 @@ export function Room3D({
         //   scene
         // );
         // testBox.position = new Vector3(0, 1, 0); // Raise box higher
-        
+
         // const testBoxMaterial = new StandardMaterial("testBoxMaterial", scene);
         // testBoxMaterial.diffuseColor = new Color3(1, 0, 0); // Red color
         // testBox.material = testBoxMaterial;
 
-         // Create shadow generator with simple configuration
-         const shadowGenerator = new ShadowGenerator(1024, centerLight);
-         
-         // Configure shadow generator with basic settings
-         shadowGenerator.useBlurExponentialShadowMap = false; // Disable blur for testing
-         shadowGenerator.darkness = 0.8; // Very dark shadows
-         
-         // Enable shadows on the light
-         centerLight.shadowEnabled = true;
-        
+        // Create shadow generator with simple configuration
+        const shadowGenerator = new ShadowGenerator(1024, centerLight);
+
+        // Configure shadow generator with basic settings
+        shadowGenerator.useBlurExponentialShadowMap = false; // Disable blur for testing
+        shadowGenerator.darkness = 0.8; // Very dark shadows
+
+        // Enable shadows on the light
+        centerLight.shadowEnabled = true;
+
         // Store shadow generator in scene metadata for later access
         scene.metadata = {
           ...scene.metadata,
-          shadowGenerator: shadowGenerator
+          shadowGenerator: shadowGenerator,
         };
 
         // Add room elements as shadow casters
@@ -685,22 +685,24 @@ export function Room3D({
         [frontWall, backWall, leftWall, rightWall].forEach((wall) => {
           wall.receiveShadows = true;
         });
-        
+
         // Force all meshes to be shadow casters and receivers
         scene.meshes.forEach((mesh: any) => {
-          if (mesh.name !== "__root__" && 
-              !mesh.name.includes("lightSphere") && 
-              !mesh.name.startsWith("furniture_")) {
+          if (
+            mesh.name !== "__root__" &&
+            !mesh.name.includes("lightSphere") &&
+            !mesh.name.startsWith("furniture_")
+          ) {
             shadowGenerator.addShadowCaster(mesh);
             mesh.receiveShadows = true;
           }
         });
-         
-         // Force shadow map update
-         shadowGenerator.getShadowMap()?.render();
-         
-         // Debug shadow map
-         const shadowMap = shadowGenerator.getShadowMap();
+
+        // Force shadow map update
+        shadowGenerator.getShadowMap()?.render();
+
+        // Debug shadow map
+        const shadowMap = shadowGenerator.getShadowMap();
 
         // Setup drag drop for furniture meshes only
         scene.onPointerObservable.add((pointerInfo: any) => {
@@ -712,7 +714,7 @@ export function Room3D({
               ) {
                 // Use the root furniture mesh for dragging
                 let furnitureMesh = pointerInfo.pickInfo.pickedMesh;
-                
+
                 // Find the root furniture mesh
                 if (!furnitureMesh.name.startsWith("furniture_")) {
                   let currentMesh = furnitureMesh;
@@ -746,7 +748,7 @@ export function Room3D({
                   (furnitureMesh as any).renderOutline = (
                     furnitureMesh as any
                   ).isSelected;
-                  
+
                   // Change cursor
                   if ((furnitureMesh as any).isSelected) {
                     document.body.style.cursor = "move";
@@ -776,12 +778,12 @@ export function Room3D({
                       furnitureId: furnitureMesh.name,
                     });
                   } else {
-                  setContextMenu({
-                    visible: true,
-                    x: pointerInfo.event.clientX,
-                    y: pointerInfo.event.clientY,
-                    furnitureId: furnitureMesh.name,
-                  });
+                    setContextMenu({
+                      visible: true,
+                      x: pointerInfo.event.clientX,
+                      y: pointerInfo.event.clientY,
+                      furnitureId: furnitureMesh.name,
+                    });
                   }
 
                   // Prepare for drag detection
@@ -798,7 +800,7 @@ export function Room3D({
                 scene.meshes.forEach((mesh: any) => {
                   if (mesh.name.startsWith("furniture_") && mesh.isSelected) {
                     mesh.isSelected = false;
-                      mesh.renderOutline = false;
+                    mesh.renderOutline = false;
                   }
                 });
                 document.body.style.cursor = "default";
@@ -916,7 +918,7 @@ export function Room3D({
 
         // Store cleanup function for later use
         (engine as any).cleanup = cleanup;
-        
+
         // Notify parent that scene is loaded
         if (onSceneLoaded) {
           onSceneLoaded(true);
@@ -937,29 +939,40 @@ export function Room3D({
   useEffect(() => {
     if (sceneRef.current) {
       console.log("🔄 Room3D useEffect triggered with furniture:", furniture);
-      
+      console.log(
+        "🔄 Current created furniture:",
+        Array.from(createdFurnitureRef.current)
+      );
+
       // Only create furniture that hasn't been created yet
-      const newFurniture = furniture.filter(item => !createdFurnitureRef.current.has(item.id));
-      
-      if (newFurniture.length > 0) {
-        console.log("🔄 Creating new furniture:", newFurniture.map(f => f.id));
-        createFurnitureFromProps(
-          sceneRef.current,
-          newFurniture,
-          setContextMenu,
-          furnitureMeshesRef,
-          furnitureStateRef,
-          createdFurnitureRef
-        );
-      }
-      
+      const newFurniture = furniture.filter(
+        (item) => !createdFurnitureRef.current.has(item.id)
+      );
+
+      console.log(
+        "🔄 New furniture to create:",
+        newFurniture.map((f) => f.id)
+      );
+
+      // Always call createFurnitureFromProps to handle both creation and removal
+      createFurnitureFromProps(
+        sceneRef.current,
+        furniture, // Pass all furniture, not just new ones
+        setContextMenu,
+        furnitureMeshesRef,
+        furnitureStateRef,
+        createdFurnitureRef
+      );
+
       // Update shadow generator for any new meshes
       const shadowGenerator = sceneRef.current.metadata?.shadowGenerator;
       if (shadowGenerator) {
         sceneRef.current.meshes.forEach((mesh: any) => {
-          if (mesh.name !== "__root__" && 
-              !mesh.name.startsWith("furniture_") && 
-              !mesh.name.includes("lightSphere")) {
+          if (
+            mesh.name !== "__root__" &&
+            !mesh.name.startsWith("furniture_") &&
+            !mesh.name.includes("lightSphere")
+          ) {
             shadowGenerator.addShadowCaster(mesh);
             mesh.receiveShadows = true;
           }
@@ -1020,7 +1033,7 @@ export function Room3D({
         className="w-full h-full rounded-lg"
         style={{ touchAction: "none" }}
       />
-      
+
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
@@ -1047,15 +1060,18 @@ export function Room3D({
             </button>
           </div>
           <div className="flex flex-col space-y-1">
-            <button 
+            <button
               className="flex items-center space-x-2 px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 // Get current rotation from furniture state or mesh
                 let currentRotation = 0;
-                const furnitureId = contextMenu.furnitureId.replace("furniture_", "");
-                
+                const furnitureId = contextMenu.furnitureId.replace(
+                  "furniture_",
+                  ""
+                );
+
                 // First try to get from saved state
                 const savedState = furnitureStateRef.current.get(furnitureId);
                 if (savedState && savedState.rotation !== undefined) {
@@ -1063,27 +1079,36 @@ export function Room3D({
                   console.log("🔄 Using saved rotation:", currentRotation);
                 } else if (sceneRef.current) {
                   // Fallback to mesh rotation
-                  const furniture = sceneRef.current.getMeshByName(contextMenu.furnitureId);
+                  const furniture = sceneRef.current.getMeshByName(
+                    contextMenu.furnitureId
+                  );
                   if (furniture) {
                     // Check if furniture has a container
                     const container = furniture.parent;
-                    if (container && container.name.includes('_container')) {
+                    if (container && container.name.includes("_container")) {
                       currentRotation = (container.rotation.y * 180) / Math.PI;
-                      console.log("🔄 Using container rotation:", currentRotation);
+                      console.log(
+                        "🔄 Using container rotation:",
+                        currentRotation
+                      );
                     } else {
                       currentRotation = (furniture.rotation.y * 180) / Math.PI;
-                      console.log("🔄 Using furniture rotation:", currentRotation);
+                      console.log(
+                        "🔄 Using furniture rotation:",
+                        currentRotation
+                      );
                     }
                   }
                 }
                 // Normalize rotation to 0-360 range
-                const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+                const normalizedRotation =
+                  ((currentRotation % 360) + 360) % 360;
                 console.log("🔄 Normalized rotation:", normalizedRotation);
-                
+
                 // Show rotation slider but keep context menu visible
                 setRotationSlider({
                   visible: true,
-                  value: normalizedRotation
+                  value: normalizedRotation,
                 });
                 // Don't hide context menu - keep it visible with rotation slider
               }}
@@ -1091,14 +1116,17 @@ export function Room3D({
               <span>🔄</span>
               <span>Rotate</span>
             </button>
-            <button 
+            <button
               className="flex items-center space-x-2 px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 // Remove furniture
                 if (onFurnitureRemove) {
-                  const furnitureId = contextMenu.furnitureId.replace("furniture_", "");
+                  const furnitureId = contextMenu.furnitureId.replace(
+                    "furniture_",
+                    ""
+                  );
                   onFurnitureRemove(furnitureId);
                 }
                 // Close both context menu and rotation slider
@@ -1158,46 +1186,67 @@ export function Room3D({
                     );
                     if (furniture) {
                       console.log("🔄 Rotation slider changed to:", newValue);
-                      
+
                       // Create invisible container approach
-                      console.log("🔄 Creating invisible container for rotation");
-                      
+                      console.log(
+                        "🔄 Creating invisible container for rotation"
+                      );
+
                       // Check if furniture already has a container
                       let container = furniture.parent;
-                      if (!container || !container.name.includes('_container')) {
+                      if (
+                        !container ||
+                        !container.name.includes("_container")
+                      ) {
                         console.log("🔄 Creating new container for furniture");
-                        
+
                         // Create invisible container
                         const containerName = `${furniture.name}_container`;
-                        container = MeshBuilder.CreateBox(containerName, {
-                          width: 2,
-                          height: 2,
-                          depth: 2
-                        }, sceneRef.current);
-                        
+                        container = MeshBuilder.CreateBox(
+                          containerName,
+                          {
+                            width: 2,
+                            height: 2,
+                            depth: 2,
+                          },
+                          sceneRef.current
+                        );
+
                         // Make container invisible
                         container.isVisible = false;
                         container.enablePointerMoveEvents = false;
-                        
+
                         // Set container position to furniture position
                         container.position = furniture.position.clone();
-                        
+
                         // Make furniture a child of container
                         furniture.setParent(container);
-                        
+
                         // Update furniture position relative to container
                         furniture.position = Vector3.Zero();
-                        
+
                         console.log("🔄 Container created:", container.name);
-                        console.log("🔄 Container position:", container.position);
-                        console.log("🔄 Furniture position relative to container:", furniture.position);
+                        console.log(
+                          "🔄 Container position:",
+                          container.position
+                        );
+                        console.log(
+                          "🔄 Furniture position relative to container:",
+                          furniture.position
+                        );
                       } else {
-                        console.log("🔄 Using existing container:", container.name);
+                        console.log(
+                          "🔄 Using existing container:",
+                          container.name
+                        );
                       }
-                      
+
                       // Rotate the container instead of furniture
                       container.rotation.y = (newValue * Math.PI) / 180;
-                      console.log("🔄 Container rotation applied:", container.rotation.y);
+                      console.log(
+                        "🔄 Container rotation applied:",
+                        container.rotation.y
+                      );
 
                       // Save furniture state using container position
                       const furnitureId = contextMenu.furnitureId.replace(
@@ -1214,7 +1263,9 @@ export function Room3D({
 
                       // Don't call onFurnitureMove during rotation to prevent reload
                       // The rotation state is already saved in furnitureStateRef
-                      console.log("🔄 Rotation applied, skipping onFurnitureMove to prevent reload");
+                      console.log(
+                        "🔄 Rotation applied, skipping onFurnitureMove to prevent reload"
+                      );
                     }
                   }
                 }}
@@ -1226,54 +1277,6 @@ export function Room3D({
               <span className="text-white text-sm">
                 {Math.round(rotationSlider.value)}°
               </span>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                className="flex-1 bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
-                onClick={() => {
-                  setRotationSlider((prev) => ({ ...prev, visible: false }));
-                }}
-              >
-                Done
-            </button>
-              <button
-                className="flex-1 bg-gray-600 text-white px-3 py-1 rounded text-xs hover:bg-gray-700 transition-colors"
-                onClick={() => {
-                  // Reset to 0 degrees
-                  if (sceneRef.current) {
-                    const furniture = sceneRef.current.getMeshByName(
-                      contextMenu.furnitureId
-                    );
-                    if (furniture) {
-                      furniture.rotation.y = 0;
-                      setRotationSlider((prev) => ({ ...prev, value: 0 }));
-
-                      // Save reset state
-                      const furnitureId = contextMenu.furnitureId.replace(
-                        "furniture_",
-                        ""
-                      );
-                      furnitureStateRef.current.set(furnitureId, {
-                        position: {
-                          x: furniture.position.x * 100,
-                          z: furniture.position.z * 100,
-                        },
-                        rotation: 0,
-                      });
-
-                      // Update parent component
-                      if (onFurnitureMove) {
-                        onFurnitureMove(furnitureId, {
-                          x: furniture.position.x * 100,
-                          z: furniture.position.z * 100,
-                        });
-                      }
-                    }
-                  }
-                }}
-              >
-                Reset
-            </button>
             </div>
           </div>
         </div>
@@ -1295,7 +1298,92 @@ async function createFurnitureFromProps(
   const { SceneLoader, Color3, Vector3, MeshBuilder, StandardMaterial } =
     await import("@babylonjs/core");
 
-  console.log("🪑 Creating furniture:", furniture.map(f => f.id));
+  console.log(
+    "🪑 Creating furniture:",
+    furniture.map((f) => f.id)
+  );
+
+  // Get existing furniture meshes in scene
+  const existingFurniture = scene.meshes.filter((mesh: any) =>
+    mesh.name.startsWith("furniture_")
+  );
+
+  console.log(
+    "🪑 Existing furniture in scene:",
+    existingFurniture.map((m: any) => m.name)
+  );
+
+  // Get existing furniture IDs
+  const existingFurnitureIds = new Set(
+    existingFurniture.map((mesh: any) => mesh.name.replace("furniture_", ""))
+  );
+
+  console.log("🪑 Existing furniture IDs:", Array.from(existingFurnitureIds));
+
+  // Get new furniture IDs from props
+  const newFurnitureIds = new Set(furniture.map((item) => item.id));
+
+  console.log("🪑 New furniture IDs from props:", Array.from(newFurnitureIds));
+
+  // Only remove furniture that was previously created but no longer in props
+  const furnitureToRemove = existingFurniture.filter((mesh: any) => {
+    const furnitureId = mesh.name.replace("furniture_", "");
+    const wasCreated = createdFurnitureRef?.current.has(furnitureId);
+    const notInProps = !newFurnitureIds.has(furnitureId);
+    
+    // Only remove if it was created before but not in current props
+    return wasCreated && notInProps;
+  });
+
+  console.log(
+    "🪑 Furniture to remove:",
+    furnitureToRemove.map((m: any) => m.name)
+  );
+  console.log("🪑 Created furniture ref:", Array.from(createdFurnitureRef?.current || []));
+
+  furnitureToRemove.forEach((mesh: any) => {
+    console.log("🗑️ Disposing furniture mesh:", mesh.name);
+
+    // Remove all child meshes from tracking
+    const childMeshes = scene.meshes.filter(
+      (childMesh: any) =>
+        childMesh.parent === mesh ||
+        (childMesh.parent && childMesh.parent.name === mesh.name)
+    );
+
+    console.log(
+      "🗑️ Child meshes to dispose:",
+      childMeshes.map((m: any) => m.name)
+    );
+
+    // Remove from shadow generator
+    const shadowGenerator = scene.metadata?.shadowGenerator;
+    if (shadowGenerator) {
+      // Remove main mesh
+      shadowGenerator.removeShadowCaster(mesh);
+      // Remove all child meshes
+      childMeshes.forEach((childMesh: any) => {
+        shadowGenerator.removeShadowCaster(childMesh);
+      });
+    }
+
+    childMeshes.forEach((childMesh: any) => {
+      furnitureMeshesRef.current.delete(childMesh.name);
+    });
+
+    mesh.dispose();
+    furnitureMeshesRef.current.delete(mesh.name);
+    console.log("🗑️ Furniture mesh disposed:", mesh.name);
+  });
+
+  // Remove from created furniture tracking
+  furnitureToRemove.forEach((mesh: any) => {
+    const furnitureId = mesh.name.replace("furniture_", "");
+    if (createdFurnitureRef) {
+      createdFurnitureRef.current.delete(furnitureId);
+      console.log("🗑️ Removed from created furniture tracking:", furnitureId);
+    }
+  });
 
   // Don't create furniture if no furniture items
   if (furniture.length === 0) {
@@ -1304,6 +1392,18 @@ async function createFurnitureFromProps(
 
   // Only create new furniture (no updating existing furniture)
   for (const item of furniture) {
+    // Skip if furniture already exists in scene
+    if (existingFurnitureIds.has(item.id)) {
+      console.log("🪑 Skipping existing furniture:", item.id);
+      continue;
+    }
+    
+    // Skip if furniture was already created (to avoid duplicates)
+    if (createdFurnitureRef?.current.has(item.id)) {
+      console.log("🪑 Skipping already created furniture:", item.id);
+      continue;
+    }
+    
     console.log("🪑 Creating furniture item:", item.id);
 
     // Use saved state if available, otherwise use item position
@@ -1331,35 +1431,42 @@ async function createFurnitureFromProps(
 
     // Apply rotation to fallback box
     fallbackBox.rotation.y = rotation;
-    
+
     // Create container for rotation if rotation is not 0
     if (Math.abs(rotation) > 0.001) {
-      console.log("🔄 Creating container for new furniture with rotation:", rotation);
-      
+      console.log(
+        "🔄 Creating container for new furniture with rotation:",
+        rotation
+      );
+
       // Create invisible container
       const containerName = `furniture_${item.id}_container`;
-      const container = MeshBuilder.CreateBox(containerName, {
-        width: 2,
-        height: 2,
-        depth: 2
-      }, scene);
-      
+      const container = MeshBuilder.CreateBox(
+        containerName,
+        {
+          width: 2,
+          height: 2,
+          depth: 2,
+        },
+        scene
+      );
+
       // Make container invisible
       container.isVisible = false;
       container.enablePointerMoveEvents = false;
-      
+
       // Set container position to furniture position
       container.position = new Vector3(scaledX, 0.25, scaledZ);
-      
+
       // Make furniture a child of container
       fallbackBox.setParent(container);
-      
+
       // Update furniture position relative to container
       fallbackBox.position = Vector3.Zero();
-      
+
       // Apply rotation to container
       container.rotation.y = rotation;
-      
+
       console.log("🔄 Container created for new furniture:", container.name);
       console.log("🔄 Container position:", container.position);
       console.log("🔄 Container rotation:", container.rotation.y);
@@ -1382,8 +1489,9 @@ async function createFurnitureFromProps(
         if (meshes.length > 0) {
           // Check if fallback box has a container before disposing
           const fallbackContainer = fallbackBox.parent;
-          const hasContainer = fallbackContainer && fallbackContainer.name.includes('_container');
-          
+          const hasContainer =
+            fallbackContainer && fallbackContainer.name.includes("_container");
+
           // Remove fallback box
           fallbackBox.dispose();
 
@@ -1392,21 +1500,28 @@ async function createFurnitureFromProps(
 
           // Scale and position the loaded model
           furnitureMesh.scaling.scaleInPlace(item.scale);
-          
+
           if (hasContainer) {
             // If fallback had a container, use the container for the loaded model
             console.log("🔄 Preserving container for loaded model");
             furnitureMesh.position = Vector3.Zero(); // Position relative to container
             furnitureMesh.rotation.y = 0; // Reset rotation since container handles it
             furnitureMesh.name = `furniture_${item.id}`;
-            
+
             // Make loaded model a child of the container
             furnitureMesh.setParent(fallbackContainer);
-            
-            console.log("🔄 Loaded model added to existing container:", fallbackContainer.name);
+
+            console.log(
+              "🔄 Loaded model added to existing container:",
+              fallbackContainer.name
+            );
           } else {
             // No container, position and rotate directly
-            furnitureMesh.position = new Vector3(scaledX, item.yOffset, scaledZ);
+            furnitureMesh.position = new Vector3(
+              scaledX,
+              item.yOffset,
+              scaledZ
+            );
             const rotation = savedState
               ? (savedState.rotation * Math.PI) / 180
               : (item.rotation * Math.PI) / 180;
@@ -1421,7 +1536,7 @@ async function createFurnitureFromProps(
 
           // Add furniture to shadow generator
           const shadowGenerator = scene.metadata?.shadowGenerator;
-          
+
           if (shadowGenerator) {
             meshes.forEach((mesh: any) => {
               shadowGenerator.addShadowCaster(mesh);
@@ -1431,10 +1546,10 @@ async function createFurnitureFromProps(
 
           // Add custom drag drop functionality
           addCustomDragDrop(furnitureMesh, scene, item);
-          
+
           // Add selection effect
           await addSelectionEffect(furnitureMesh, scene, setContextMenu);
-          
+
           // Mark furniture as created
           if (createdFurnitureRef) {
             createdFurnitureRef.current.add(item.id);
@@ -1464,18 +1579,18 @@ function getGroundPositionForFurniture(scene: any, furnitureMesh: any) {
   if (pickinfo.hit) {
     return pickinfo.pickedPoint;
   }
-  
+
   // Fallback: create a ray from camera through mouse position
   const camera = scene.cameras[0];
   const ray = camera.getForwardRay();
-  
+
   // Intersect with ground plane (y = 0)
   const distance = -ray.origin.y / ray.direction.y;
   if (distance > 0) {
     const intersection = ray.origin.add(ray.direction.scale(distance));
     return intersection;
   }
-  
+
   return null;
 }
 
@@ -1518,10 +1633,12 @@ function pointerMove(scene: any, furniture: any[], furnitureStateRef: any) {
 
   // Check if furniture has a container (after rotation)
   const container = currentMesh.parent;
-  const isInContainer = container && container.name.includes('_container');
-  
+  const isInContainer = container && container.name.includes("_container");
+
   // Calculate new position - use container position if in container
-  const basePosition = isInContainer ? container.position : currentMesh.position;
+  const basePosition = isInContainer
+    ? container.position
+    : currentMesh.position;
   const newPosition = basePosition.add(diff);
 
   // Get furniture item from furniture array
@@ -1553,9 +1670,13 @@ function pointerMove(scene: any, furniture: any[], furnitureStateRef: any) {
 
   // Save furniture state
   const furnitureId = currentMesh.name.replace("furniture_", "");
-  const savePosition = isInContainer ? container.position : currentMesh.position;
-  const saveRotation = isInContainer ? container.rotation.y : currentMesh.rotation.y;
-  
+  const savePosition = isInContainer
+    ? container.position
+    : currentMesh.position;
+  const saveRotation = isInContainer
+    ? container.rotation.y
+    : currentMesh.rotation.y;
+
   furnitureStateRef.current.set(furnitureId, {
     position: {
       x: savePosition.x * 100, // Convert back to meters
@@ -1563,7 +1684,7 @@ function pointerMove(scene: any, furniture: any[], furnitureStateRef: any) {
     },
     rotation: (saveRotation * 180) / Math.PI, // Convert back to degrees
   });
-  
+
   // Update outline position if it exists
   if (currentMesh.updateOutlinePosition) {
     currentMesh.updateOutlinePosition();
@@ -1634,7 +1755,7 @@ async function addSelectionEffect(
     furnitureMesh.renderOutline = false; // Start with outline hidden
     furnitureMesh.outlineColor = new Color3(1, 1, 0); // Bright yellow outline
     furnitureMesh.outlineWidth = 0.1;
-    
+
     // Store reference for selection detection
     furnitureMesh.isSelected = false;
   } catch (error) {
