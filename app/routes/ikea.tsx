@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { RoomBuilder } from "~/components/Ikea/RoomBuilder";
 import { RoomInput } from "~/components/Ikea/RoomInput";
 import { Room3D } from "~/components/Ikea/Room3D";
@@ -12,27 +12,46 @@ export default function IkeaRoute() {
     length: number;
   } | null>({ width: 400, length: 500 }); // Default dimensions
   const [furniture, setFurniture] = useState<any[]>([]);
+  const [isSceneLoaded, setIsSceneLoaded] = useState(false);
+  const isRemovingRef = useRef(false);
 
   const handleRoomCreate = (width: number, length: number) => {
     setRoomDimensions({ width, length });
+    setIsSceneLoaded(false); // Reset scene loaded state when room dimensions change
   };
 
-  const handleFurnitureMove = (
+  const handleFurnitureMove = useCallback((
     id: string,
     position: { x: number; z: number }
   ) => {
     setFurniture((prev) =>
       prev.map((item) => (item.id === id ? { ...item, position } : item))
     );
-  };
+  }, []);
 
   const handleFurnitureUpdate = (newFurniture: any[]) => {
+    // Skip update if we're in the middle of a remove operation
+    if (isRemovingRef.current) {
+      return;
+    }
+    
     setFurniture(newFurniture);
   };
 
   // Handle furniture menu actions
   const handleFurnitureRemove = (furnitureId: string) => {
-    setFurniture((prev) => prev.filter((item) => item.id !== furnitureId));
+    // Set removing flag to prevent circular update
+    isRemovingRef.current = true;
+    
+    setFurniture((prev) => {
+      const newFurniture = prev.filter((item) => item.id !== furnitureId);
+      return newFurniture;
+    });
+    
+    // Reset removing flag after a short delay
+    setTimeout(() => {
+      isRemovingRef.current = false;
+    }, 100);
   };
 
   const handleNextStep = () => {
@@ -96,9 +115,14 @@ export default function IkeaRoute() {
                     <div className="mt-4">
                       <button
                         onClick={handleNextStep}
-                        className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                        disabled={!isSceneLoaded}
+                        className={`py-2 px-4 rounded-lg transition-colors ${
+                          isSceneLoaded
+                            ? "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        }`}
                       >
-                        Next →
+                        {isSceneLoaded ? "Next →" : "Loading 3D Scene..."}
                       </button>
                     </div>
                   </div>
@@ -119,6 +143,7 @@ export default function IkeaRoute() {
                     length={roomDimensions.length}
                     onFurnitureMove={handleFurnitureMove}
                     onFurnitureUpdate={handleFurnitureUpdate}
+                    furniture={furniture}
                   />
                 </div>
               </div>
@@ -137,6 +162,7 @@ export default function IkeaRoute() {
                 furniture={furniture}
                 onFurnitureMove={handleFurnitureMove}
                 onFurnitureRemove={handleFurnitureRemove}
+                onSceneLoaded={setIsSceneLoaded}
               />
             </div>
           </div>

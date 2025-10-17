@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface RoomBuilderProps {
   width: number;
   length: number;
   onFurnitureMove?: (id: string, position: { x: number; z: number }) => void;
   onFurnitureUpdate?: (furniture: FurnitureItem[]) => void;
+  furniture?: FurnitureItem[];
 }
 
 interface FurnitureItem {
@@ -24,11 +25,14 @@ export function RoomBuilder({
   length,
   onFurnitureMove,
   onFurnitureUpdate,
+  furniture: externalFurniture,
 }: RoomBuilderProps) {
   const [furniture, setFurniture] = useState<FurnitureItem[]>([]);
   const [selectedFurniture, setSelectedFurniture] = useState<string | null>(
     null
   );
+  const [isAddingFurniture, setIsAddingFurniture] = useState(false);
+  const prevExternalFurnitureRef = useRef<FurnitureItem[]>([]);
 
   const furnitureCatalog = [
     {
@@ -50,6 +54,7 @@ export function RoomBuilder({
   ];
 
   const addFurniture = (item: (typeof furnitureCatalog)[0]) => {
+    setIsAddingFurniture(true);
     const newFurniture: FurnitureItem = {
       id: `${item.name}_${Date.now()}`,
       name: item.name,
@@ -62,7 +67,29 @@ export function RoomBuilder({
       yOffset: item.yOffset,
     };
     setFurniture((prev) => [...prev, newFurniture]);
+    
+    // Reset flag after a short delay
+    setTimeout(() => {
+      setIsAddingFurniture(false);
+    }, 100);
   };
+
+  // Sync external furniture with local state
+  useEffect(() => {
+    if (externalFurniture && !isAddingFurniture) {
+      // Only sync if external furniture is different from previous external furniture
+      const isDifferent = externalFurniture.length !== prevExternalFurnitureRef.current.length || 
+        externalFurniture.some((extItem, index) => {
+          const prevItem = prevExternalFurnitureRef.current[index];
+          return !prevItem || extItem.id !== prevItem.id;
+        });
+      
+      if (isDifferent) {
+        setFurniture(externalFurniture);
+        prevExternalFurnitureRef.current = externalFurniture;
+      }
+    }
+  }, [externalFurniture, isAddingFurniture]);
 
   // Notify parent when furniture changes
   useEffect(() => {
