@@ -11,12 +11,12 @@ interface FurnitureItem {
   id: string;
   name: string;
   category: string;
-  width: number;
-  length: number;
-  height: number;
   color: string;
   position: { x: number; z: number };
   rotation: number;
+  modelFile: string;
+  scale: number;
+  yOffset: number;
 }
 
 export function RoomBuilder({
@@ -34,10 +34,18 @@ export function RoomBuilder({
     {
       name: "Table",
       category: "Seating",
-      width: 2.0,
-      length: 0.8,
-      height: 0.8,
       color: "#8B4513",
+      modelFile: "table.glb",
+      scale: 0.2,
+      yOffset: 0.1,
+    },
+    {
+      name: "Chair",
+      category: "Seating",
+      color: "#654321",
+      modelFile: "chair.glb",
+      scale: 1,
+      yOffset: 0.55,
     },
   ];
 
@@ -46,12 +54,12 @@ export function RoomBuilder({
       id: `${item.name}_${Date.now()}`,
       name: item.name,
       category: item.category,
-      width: item.width,
-      length: item.length,
-      height: item.height,
       color: item.color,
       position: { x: 0, z: 0 }, // Đặt ở giữa phòng (0,0)
       rotation: 0,
+      modelFile: item.modelFile,
+      scale: item.scale,
+      yOffset: item.yOffset,
     };
     setFurniture((prev) => [...prev, newFurniture]);
   };
@@ -68,44 +76,6 @@ export function RoomBuilder({
     if (selectedFurniture === id) {
       setSelectedFurniture(null);
     }
-  };
-
-  const updateFurniturePosition = (
-    id: string,
-    position: { x: number; z: number }
-  ) => {
-    setFurniture((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, position } : item))
-    );
-
-    // Notify parent component about furniture movement
-    if (onFurnitureMove) {
-      onFurnitureMove(id, position);
-    }
-  };
-
-  const updateFurnitureRotation = (id: string, rotation: number) => {
-    setFurniture((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, rotation } : item))
-    );
-  };
-
-  const getRoomArea = () => {
-    return (width * length).toFixed(1);
-  };
-
-  const getUsedArea = () => {
-    const usedArea = furniture.reduce((total, item) => {
-      return total + item.width * item.length;
-    }, 0);
-    return usedArea.toFixed(1);
-  };
-
-  const getAvailableArea = () => {
-    const usedArea = furniture.reduce((total, item) => {
-      return total + item.width * item.length;
-    }, 0);
-    return (width * length - usedArea).toFixed(1);
   };
 
   return (
@@ -134,9 +104,6 @@ export function RoomBuilder({
                       </div>
                       <div className="text-xs text-gray-600">
                         {item.category}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {item.width}m × {item.length}m
                       </div>
                     </div>
                   </div>
@@ -194,10 +161,6 @@ export function RoomBuilder({
                     >
                       ×
                     </button>
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    ({item.position.x.toFixed(1)}, {item.position.z.toFixed(1)})
-                    | {item.rotation}°
                   </div>
                 </div>
               ))}

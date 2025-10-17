@@ -30,15 +30,14 @@ export default function IkeaRoute() {
     setFurniture(newFurniture);
   };
 
+  // Handle furniture menu actions
+  const handleFurnitureRemove = (furnitureId: string) => {
+    setFurniture((prev) => prev.filter((item) => item.id !== furnitureId));
+  };
+
   const handleNextStep = () => {
     if (currentStep < 2) {
       setCurrentStep((currentStep + 1) as Step);
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((currentStep - 1) as Step);
     }
   };
 
@@ -113,20 +112,6 @@ export default function IkeaRoute() {
                   <h2 className="text-lg font-semibold text-gray-800">
                     Step 2: Add Furniture to Room
                   </h2>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handlePrevStep}
-                      className="bg-gray-600 text-white py-2 px-3 rounded-lg hover:bg-gray-700 transition-colors text-sm"
-                    >
-                      ← Back
-                    </button>
-                    <button
-                      onClick={handleNextStep}
-                      className="bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                    >
-                      Finish →
-                    </button>
-                  </div>
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <RoomBuilder
@@ -151,6 +136,7 @@ export default function IkeaRoute() {
                 length={roomDimensions?.length || 500}
                 furniture={furniture}
                 onFurnitureMove={handleFurnitureMove}
+                onFurnitureRemove={handleFurnitureRemove}
               />
             </div>
           </div>
